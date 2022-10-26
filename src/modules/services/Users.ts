@@ -4,9 +4,11 @@ import User from '@modules/entities/User';
 import UserRepository from '@modules/repositories/UserRepository';
 import { getCustomRepository } from 'typeorm';
 import { compare, hash } from 'bcrypt';
+import { isAfter, addHours } from 'date-fns';
 import JWT from 'jsonwebtoken';
 import upload from '@config/upload';
 import fs, { readFileSync } from 'fs';
+import UserTokenRepository from '@modules/repositories/UserTokenRepository';
 
 interface IUser {
   name?: string;
@@ -67,7 +69,7 @@ class UsersService {
     return { ...hasUser, token };
   }
 
-  async updateAvatar({ avatarFile, user_id }: IAvatarFile) {
+  async updateAvatar({ avatarFile, user_id }: IAvatarFile): Promise<User> {
     const repositoryUser = getCustomRepository(UserRepository);
 
     const user = await repositoryUser.findById(user_id);
@@ -88,6 +90,47 @@ class UsersService {
     await repositoryUser.save(user);
 
     return user;
+  }
+
+  public async sendForgotPasswordEmail(email: string): Promise<void> {
+    const repositoryUser = getCustomRepository(UserRepository);
+    const repositoryUserToken = getCustomRepository(UserTokenRepository);
+
+    const user = await repositoryUser.findByEmail(email);
+
+    if (!user) throw new AppError('User email not found', 404);
+
+    const token = await repositoryUserToken.generateToken(user.id);
+
+    console.log(token);
+  }
+
+  public async resetPassword({ password, token }: IUser): Promise<void> {
+    const repositoryUser = getCustomRepository(UserRepository);
+
+    const repositoryUserToken = getCustomRepository(UserTokenRepository);
+
+    const userToken = await repositoryUserToken.findByToken(token as string);
+
+    if (!userToken) throw new AppError('UserToken not exists', 404);
+
+    const user = await repositoryUser.findById(userToken.user_id);
+
+    if (!user) throw new AppError('user not exists', 404);
+
+    const tokenCreatedAt = userToken.created_at;
+
+    const compareDate = addHours(tokenCreatedAt, 2);
+
+    if (isAfter(Date.now(), compareDate)) {
+      throw new AppError('Token expired', 401);
+    }
+
+    const hashPassword = await hash(password, 8);
+
+    user.password = hashPassword;
+
+    await repositoryUser.save(user);
   }
 }
 export default UsersService;

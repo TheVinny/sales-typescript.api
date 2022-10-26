@@ -5,7 +5,7 @@ const ErrorMiddleware = (
   error: Error,
   req: Request,
   res: Response,
-  next: NextFunction,
+  _next: NextFunction,
 ) => {
   if (error instanceof AppError) {
     res.status(error.statusCode).json({
@@ -13,7 +13,9 @@ const ErrorMiddleware = (
       message: error.message,
     });
   }
-  next();
+
+  console.log(error);
+
   res.status(500).json({
     status: 'error',
     message: 'Internal server error',

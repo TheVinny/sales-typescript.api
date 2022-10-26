@@ -26,6 +26,14 @@ class UsersController {
 
     return res.json(user);
   }
+
+  public async forgotPassword(req: Request, res: Response): Promise<Response> {
+    const { email } = req.body;
+
+    await new UsersService().sendForgotPasswordEmail(email);
+
+    return res.status(204).json();
+  }
 }
 
 export default UsersController;

@@ -5,13 +5,19 @@ import UserRepository from '@modules/repositories/UserRepository';
 import { getCustomRepository } from 'typeorm';
 import { compare, hash } from 'bcrypt';
 import JWT from 'jsonwebtoken';
-import { readFileSync } from 'fs';
+import upload from '@config/upload';
+import fs, { readFileSync } from 'fs';
 
 interface IUser {
   name?: string;
   email: string;
   password: string;
   token?: string;
+}
+
+interface IAvatarFile {
+  avatarFile: string;
+  user_id: string;
 }
 
 class UsersService {
@@ -59,6 +65,29 @@ class UsersService {
     const token = JWT.sign({ id: hasUser.id }, secret, { expiresIn: '1d' });
 
     return { ...hasUser, token };
+  }
+
+  async updateAvatar({ avatarFile, user_id }: IAvatarFile) {
+    const repositoryUser = getCustomRepository(UserRepository);
+
+    const user = await repositoryUser.findById(user_id);
+
+    if (!user) throw new AppError('User not found', 404);
+
+    if (user.avatar) {
+      const avatarFilePath = path.join(upload.directory, user.avatar);
+      const userAvatarFile = await fs.promises.stat(avatarFilePath);
+
+      if (userAvatarFile) {
+        await fs.promises.unlink(avatarFilePath);
+      }
+    }
+
+    user.avatar = avatarFile;
+
+    await repositoryUser.save(user);
+
+    return user;
   }
 }
 export default UsersService;

@@ -12,7 +12,7 @@ interface TokenPayload {
 
 export default async function AuthMiddleware(
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction,
 ): Promise<void> {
   const token = req.headers.authorization?.split(' ')[1];

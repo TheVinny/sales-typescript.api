@@ -34,6 +34,14 @@ class UsersController {
 
     return res.status(204).json();
   }
+
+  public async resetPassword(req: Request, res: Response): Promise<Response> {
+    const { password, token } = req.body;
+
+    await new UsersService().resetPassword(password, token);
+
+    return res.status(204).json();
+  }
 }
 
 export default UsersController;

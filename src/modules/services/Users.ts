@@ -18,6 +18,14 @@ interface IUser {
   token?: string;
 }
 
+interface IUpdateUser {
+  user_id: string;
+  name: string;
+  email: string;
+  password?: string;
+  old_password?: string;
+}
+
 interface IAvatarFile {
   avatarFile: string;
   user_id: string;
@@ -154,6 +162,61 @@ class UsersService {
     user.password = hashPassword;
 
     await repositoryUser.save(user);
+  }
+
+  public async showProfile(id: string): Promise<User> {
+    const repositoryUser = getCustomRepository(UserRepository);
+
+    const user = await repositoryUser.findById(id);
+
+    if (!user) throw new AppError('User not found', 404);
+
+    return user;
+  }
+
+  public async updateProfile({
+    user_id,
+    email,
+    password,
+    name,
+    old_password,
+  }: IUpdateUser): Promise<User> {
+    const repositoryUser = getCustomRepository(UserRepository);
+
+    const user = await repositoryUser.findById(user_id);
+
+    if (!user) throw new AppError('User not found', 404);
+
+    const userUpdateEmail = await repositoryUser.findByEmail(email);
+
+    if (userUpdateEmail && userUpdateEmail.id !== user_id) {
+      throw new AppError('Email already is used');
+    }
+
+    if (password && !old_password) {
+      throw new AppError('Old password is required', 401);
+    }
+
+    if (password && old_password) {
+      const check = await compare(old_password, user.password);
+
+      console.log();
+
+      console.log(password, user.password);
+
+      if (!check) {
+        throw new AppError('Old password is incorrect', 401);
+      }
+
+      user.password = await hash(password, 8);
+    }
+
+    user.name = name;
+    user.email = email;
+
+    await repositoryUser.save(user);
+
+    return user;
   }
 }
 export default UsersService;

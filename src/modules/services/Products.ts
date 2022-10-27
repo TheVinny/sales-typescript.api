@@ -4,7 +4,7 @@ import AppError from '@shared/errors/AppError';
 import { getCustomRepository } from 'typeorm';
 
 interface IProducts {
-  id: string;
+  id?: string;
   name: string;
   price: number;
   quantity: number;
@@ -56,7 +56,7 @@ class ProductsService {
   }: IProducts): Promise<Product> {
     const repositoryProduct = getCustomRepository(ProductRepository);
 
-    const product = await repositoryProduct.findById(id);
+    const product = await repositoryProduct.findById(id as string);
 
     if (!product) {
       throw new AppError('Product not found', 404);

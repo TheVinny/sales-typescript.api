@@ -42,6 +42,30 @@ class UsersController {
 
     return res.status(204).json();
   }
+
+  public async showProfile(req: Request, res: Response): Promise<Response> {
+    const { id } = req.user;
+
+    const user = await new UsersService().showProfile(id);
+
+    return res.json(user);
+  }
+
+  public async updateProfile(req: Request, res: Response): Promise<Response> {
+    const { id } = req.user;
+
+    const { name, email, password, old_password } = req.body;
+
+    const updateProfile = await new UsersService().updateProfile({
+      email,
+      name,
+      user_id: id,
+      password,
+      old_password,
+    });
+
+    return res.json(updateProfile);
+  }
 }
 
 export default UsersController;

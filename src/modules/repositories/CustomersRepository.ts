@@ -1,5 +1,4 @@
 import Costumer from '@modules/entities/Costumer';
-import User from '@modules/entities/User';
 import { EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(Costumer)

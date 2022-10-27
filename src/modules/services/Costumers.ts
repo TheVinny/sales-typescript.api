@@ -1,5 +1,5 @@
 import CostumersRepository from '@modules/repositories/CustomersRepository';
-import { getCustomRepository, IndexInformationOptions } from 'typeorm';
+import { getCustomRepository } from 'typeorm';
 import Costumer from '@modules/entities/Costumer';
 import AppError from '@shared/errors/AppError';
 
@@ -76,7 +76,7 @@ class CostumersService {
 
     if (!costumer) throw new AppError('Costumer id not found', 404);
 
-    await costumerRepository.delete(costumer);
+    await costumerRepository.remove(costumer);
   }
 }
 

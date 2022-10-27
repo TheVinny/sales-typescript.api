@@ -1,11 +1,13 @@
 import UsersService from '@modules/services/Users';
 import { Request, Response } from 'express';
 
+import { instanceToInstance } from 'class-transformer';
+
 class UsersController {
   public async getAll(_req: Request, res: Response): Promise<Response> {
     const users = await new UsersService().getAll();
 
-    return res.json(users);
+    return res.json(instanceToInstance(users));
   }
 
   public async create(req: Request, res: Response): Promise<Response> {
@@ -13,7 +15,7 @@ class UsersController {
 
     const user = await new UsersService().create({ name, email, password });
 
-    return res.json(user);
+    return res.json(instanceToInstance(user));
   }
 
   public async updateAvatar(req: Request, res: Response): Promise<Response> {
@@ -24,7 +26,7 @@ class UsersController {
       avatarFile: req.file?.filename as string,
     });
 
-    return res.json(user);
+    return res.json(instanceToInstance(user));
   }
 
   public async forgotPassword(req: Request, res: Response): Promise<Response> {
@@ -48,7 +50,7 @@ class UsersController {
 
     const user = await new UsersService().showProfile(id);
 
-    return res.json(user);
+    return res.json(instanceToInstance(user));
   }
 
   public async updateProfile(req: Request, res: Response): Promise<Response> {
@@ -64,7 +66,7 @@ class UsersController {
       old_password,
     });
 
-    return res.json(updateProfile);
+    return res.json(instanceToInstance(updateProfile));
   }
 }
 

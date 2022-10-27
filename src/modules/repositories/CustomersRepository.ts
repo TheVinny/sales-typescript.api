@@ -1,32 +1,32 @@
-import Costumer from '@modules/entities/Costumer';
+import Customer from '@modules/entities/Customer';
 import { EntityRepository, Repository } from 'typeorm';
 
-@EntityRepository(Costumer)
-class CostumersRepository extends Repository<Costumer> {
-  public async findByName(name: string): Promise<Costumer | undefined> {
-    const costumer = await this.findOne({
+@EntityRepository(Customer)
+class CustomersRepository extends Repository<Customer> {
+  public async findByName(name: string): Promise<Customer | undefined> {
+    const customer = await this.findOne({
       where: [
         {
           name,
         },
       ],
     });
-    return costumer;
+    return customer;
   }
 
-  public async findByEmail(email: string): Promise<Costumer | undefined> {
-    const costumer = await this.findOne({
+  public async findByEmail(email: string): Promise<Customer | undefined> {
+    const customer = await this.findOne({
       where: [
         {
           email,
         },
       ],
     });
-    return costumer;
+    return customer;
   }
 
-  public async findById(id: string): Promise<Costumer | undefined> {
-    const costumer = await this.findOne({
+  public async findById(id: string): Promise<Customer | undefined> {
+    const customer = await this.findOne({
       where: [
         {
           id,
@@ -34,8 +34,8 @@ class CostumersRepository extends Repository<Costumer> {
       ],
     });
 
-    return costumer;
+    return customer;
   }
 }
 
-export default CostumersRepository;
+export default CustomersRepository;

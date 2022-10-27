@@ -129,7 +129,7 @@ class UsersService {
       template: {
         file: forgotTemplate,
         variables: {
-          link: `http://localhost:3000/reset_password?token=${token}`,
+          link: `${process.env.APPWEB_URL}/reset_password?token=${token}`,
           name: user.name,
         },
       },

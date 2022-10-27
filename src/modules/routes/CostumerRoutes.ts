@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import CostumersController from '@modules/controllers/Costumers';
+import CustomersController from '@modules/controllers/Customer';
 import { celebrate, Joi, Segments } from 'celebrate';
 import AuthMiddleware from '@modules/middlewares/AuthMiddleware';
 
@@ -26,30 +26,30 @@ const middlewares = {
   }),
 };
 
-const costumersRouter: Router = Router();
+const customersRouter: Router = Router();
 
-costumersRouter.use(AuthMiddleware);
+customersRouter.use(AuthMiddleware);
 
-costumersRouter.get('/', new CostumersController().getAll);
+customersRouter.get('/', new CustomersController().getAll);
 
-costumersRouter.get(
+customersRouter.get(
   '/:id',
   middlewares.getById,
-  new CostumersController().getById,
+  new CustomersController().getById,
 );
 
-costumersRouter.post('/', middlewares.create, new CostumersController().create);
+customersRouter.post('/', middlewares.create, new CustomersController().create);
 
-costumersRouter.put(
+customersRouter.put(
   '/:id',
   middlewares.update,
-  new CostumersController().updateById,
+  new CustomersController().updateById,
 );
 
-costumersRouter.delete(
+customersRouter.delete(
   '/:id',
   middlewares.getById,
-  new CostumersController().deleteById,
+  new CustomersController().deleteById,
 );
 
-export default costumersRouter;
+export default customersRouter;

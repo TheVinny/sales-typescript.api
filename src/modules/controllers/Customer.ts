@@ -1,11 +1,11 @@
-import CostumersService from '@modules/services/Costumers';
+import CustumersService from '@modules/services/Customer';
 import { Request, Response } from 'express';
 
-class ProductsController {
+class CustomerController {
   public async create(req: Request, res: Response): Promise<Response> {
     const { name, email } = req.body;
 
-    const costumer = await new CostumersService().create({
+    const costumer = await new CustumersService().create({
       name,
       email,
     });
@@ -17,7 +17,7 @@ class ProductsController {
     const { name, email } = req.body;
     const { id } = req.params;
 
-    const costumer = await new CostumersService().updateCostumer({
+    const costumer = await new CustumersService().updateCustomer({
       name,
       email,
       id,
@@ -26,7 +26,7 @@ class ProductsController {
     return res.json(costumer);
   }
   public async getAll(_req: Request, res: Response): Promise<Response> {
-    const costumer = await new CostumersService().List();
+    const costumer = await new CustumersService().List();
 
     return res.json(costumer);
   }
@@ -34,7 +34,7 @@ class ProductsController {
   public async getById(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
 
-    const products = await new CostumersService().getOne(id);
+    const products = await new CustumersService().getOne(id);
 
     return res.json(products);
   }
@@ -42,10 +42,10 @@ class ProductsController {
   public async deleteById(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
 
-    await new CostumersService().deleteCostumer(id);
+    await new CustumersService().deleteCustomer(id);
 
     return res.status(204).json([]);
   }
 }
 
-export default ProductsController;
+export default CustomerController;

@@ -9,12 +9,15 @@ import '@shared/database';
 import { errors } from 'celebrate';
 import upload from '@config/upload';
 import { pagination } from 'typeorm-pagination';
+import ratelimiter from '@modules/middlewares/rateLimiterMiddlerare';
 
 const app = express();
 
 app.use(cors());
 
 app.use(express.json());
+
+app.use(ratelimiter);
 
 app.use(pagination);
 

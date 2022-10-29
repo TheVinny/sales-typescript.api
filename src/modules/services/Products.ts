@@ -2,6 +2,7 @@ import Product from '@modules/entities/Product';
 import ProductRepository from '@modules/repositories/ProductRepository';
 import AppError from '@shared/errors/AppError';
 import { getCustomRepository } from 'typeorm';
+import Redis from '@shared/cache/Redis';
 
 interface IProducts {
   id?: string;
@@ -20,11 +21,15 @@ class ProductsService {
       throw new AppError('There is already a product with that name', 409);
     }
 
+    const redisCache = new Redis();
+
     const product = repositoryProduct.create({
       name,
       price,
       quantity,
     });
+
+    await redisCache.invalidate('api-PRODUCT_LIST');
 
     await repositoryProduct.save(product);
 
@@ -34,7 +39,14 @@ class ProductsService {
   public async getAll(): Promise<Product[]> {
     const repositoryProduct = getCustomRepository(ProductRepository);
 
-    const products = await repositoryProduct.find();
+    const redisCache = new Redis();
+
+    let products = await redisCache.recover<Product[]>('api-PRODUCT_LIST');
+
+    if (!products) {
+      products = await repositoryProduct.find();
+      await redisCache.save('api-PRODUCT_LIST', products);
+    }
 
     return products;
   }
@@ -71,6 +83,10 @@ class ProductsService {
     product.price = price;
     product.quantity = quantity;
 
+    const redisCache = new Redis();
+
+    await redisCache.invalidate('api-PRODUCT_LIST');
+
     const productUpdated = await repositoryProduct.save(product);
 
     return productUpdated;
@@ -90,6 +106,10 @@ class ProductsService {
     if (!product) {
       throw new AppError('Product not found', 404);
     }
+
+    const redisCache = new Redis();
+
+    await redisCache.invalidate('api-PRODUCT_LIST');
 
     await repositoryProduct.remove(product);
   }

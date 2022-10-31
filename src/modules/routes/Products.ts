@@ -20,7 +20,7 @@ const middlewares = {
 
 const productsRouter: Router = Router();
 
-productsRouter.get('/', AuthMiddleware, new ProductsController().getAll);
+productsRouter.get('/', new ProductsController().getAll);
 
 productsRouter.get(
   '/:id',
@@ -32,12 +32,14 @@ productsRouter.post('/', middlewares.create, new ProductsController().create);
 
 productsRouter.put(
   '/:id',
+  AuthMiddleware,
   middlewares.create,
   new ProductsController().updateById,
 );
 
 productsRouter.delete(
   '/:id',
+  AuthMiddleware,
   middlewares.getById,
   new ProductsController().deleteById,
 );

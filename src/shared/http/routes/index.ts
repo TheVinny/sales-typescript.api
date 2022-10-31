@@ -14,7 +14,7 @@ routes.use('/auth', authRouter);
 routes.use('/users', usersRouter);
 routes.use('/products', productsRouter);
 routes.use('/profile', profileRouter);
-routes.use('/costumer', customersRouter);
+routes.use('/customer', customersRouter);
 routes.use('/order', ordersRouter);
 
 export default routes;

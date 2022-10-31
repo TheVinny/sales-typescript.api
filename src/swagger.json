@@ -1,0 +1,809 @@
+{
+  "openapi":"3.0.0",
+  "info":{
+     "title":"Sales Api",
+     "description":"Api de gerenciamento de pedidos. Tecnologias utilizadas e Libs: Node Js, Typescript, Typeorm, Multer, Class-Transform, Postgres, Docker, Redis, AWS (S3, SES)",
+     "contact":{
+        "email":"marcosdev.working@gmail.com"
+     },
+     "version":"1.0.0"
+  },
+  "servers":[
+     {
+        "url":"http://localhost:3333/",
+        "description":"URL Api"
+     }
+  ],
+  "paths":{
+     "/users":{
+        "post":{
+           "summary":"Cadastro de usuário",
+           "description":"Cadastrando um usuário na aplicação",
+           "tags":[
+              "Users"
+           ],
+           "requestBody":{
+              "content":{
+                 "application/json":{
+                    "schema":{
+                       "$ref":"#/components/schemas/users"
+                    },
+                    "examples":{
+                       "users":{
+                          "value":{
+                             "name":"John Doe",
+                             "email":"john@doe.com",
+                             "password":"123456"
+                          }
+                       }
+                    }
+                 }
+              }
+           },
+           "responses":{
+              "409":{
+                 "description":"Conflict"
+              },
+              "200":{
+                 "description":"OK",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "type":"object",
+                          "$ref":"#/components/schemas/users"
+                       }
+                    }
+                 }
+              }
+           }
+        }
+     },
+     "/auth":{
+        "post":{
+           "summary":"Autenticação de usuário",
+           "description":"Autenticando-se na aplicação",
+           "tags":[
+              "Users"
+           ],
+           "requestBody":{
+              "content":{
+                 "application/json":{
+                    "schema":{
+                       "$ref":"#/components/schemas/auth"
+                    },
+                    "examples":{
+                       "users":{
+                          "value":{
+                             "name":"John Doe",
+                             "email":"john@doe.com"
+                          }
+                       }
+                    }
+                 }
+              }
+           },
+           "responses":{
+              "401":{
+                 "description":"Unauthorized"
+              },
+              "200":{
+                 "description":"OK",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "type":"object",
+                          "properties":{
+                             "id":{
+                                "type":"string",
+                                "format":"uuid"
+                             },
+                             "name":{
+                                "type":"string"
+                             },
+                             "email":{
+                                "type":"string"
+                             },
+                             "avatar":{
+                                "type":"string"
+                             },
+                             "avatar_url":{
+                                "type":"string"
+                             },
+                             "token":{
+                                "type":"string"
+                             }
+                          }
+                       }
+                    }
+                 }
+              }
+           }
+        }
+     },
+     "/users?":{
+        "get":{
+           "summary":"Listar usuários",
+           "description":"Listando todos os usuários cadastrados na api",
+           "tags":[
+              "Users"
+           ],
+           "responses":{
+              "200":{
+                 "description":"OK",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "type":"object",
+                          "$ref":"#/components/schemas/usersGet"
+                       }
+                    }
+                 }
+              }
+           }
+        }
+     },
+     "/users/avatar":{
+        "patch":{
+           "summary":"Alterar imagem",
+           "description":"Alterando imagem do perfil",
+           "tags":[
+              "Users"
+           ],
+           "security": [{"bearerAuth": []}],
+           "requestBody":{
+              "content":{
+                 "multipart/form-data":{
+                    "schema":{
+                       "type":"object",
+                       "properties":{
+                          "file":{
+                             "type":"string",
+                             "format":"binary"
+                          }
+                       }
+                    }
+                 }
+              }
+           },
+           "responses":{
+              "200":{
+                 "description":"OK",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "type":"object",
+                          "$ref":"#/components/schemas/usersGet"
+                       }
+                    }
+                 }
+              },
+              "401":{
+                 "description":"Unauthorized"
+              },
+              "404":{
+                 "description":"Not Found"
+              }
+           }
+        }
+     },
+     "/profile":{
+        "get":{
+           "summary":"Exibir perfil",
+           "description":"Exibe o perfil do usuário com todas as informações",
+           "tags":[
+              "Profile"
+           ],
+           "security": [{"bearerAuth": []}],
+           "responses":{
+              "200":{
+                 "description":"OK",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "type":"object",
+                          "$ref":"#/components/schemas/usersGet"
+                       }
+                    }
+                 }
+              },
+              "401":{
+                 "description":"Unauthorized"
+              },
+              "404":{
+                 "description":"Not Found"
+              },
+              "400":{
+                 "description":"Bad Request"
+              }
+           }
+        },
+        "put":{
+           "summary":"Atualizar perfil",
+           "description":"Atualiza o perfil do usuário e o retorna",
+           "tags":[
+              "Profile"
+           ],
+           "security": [{"bearerAuth": []}],
+           "requestBody":{
+              "content":{
+                 "application/json":{
+                    "schema":{
+                       "$ref":"#/components/schemas/updateProfile"
+                    },
+                    "examples":{
+                       "users":{
+                          "value":{
+                             "name":"John Doe",
+                             "email":"john@doe.com",
+                             "password":"123456",
+                             "password_confirmation":"123456"
+                          }
+                       }
+                    }
+                 }
+              }
+           },
+           "responses":{
+              "200":{
+                 "description":"OK",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "type":"object",
+                          "$ref":"#/components/schemas/usersGet"
+                       }
+                    }
+                 }
+              },
+              "401":{
+                 "description":"Unauthorized"
+              },
+              "404":{
+                 "description":"Not Found"
+              }
+           }
+        }
+     },
+     "/products":{
+        "post":{
+           "summary":"Cadastro de produto",
+           "description":"Cadastrando um Produto na aplicação",
+           "tags":[
+              "Products"
+           ],
+           "security": [{"bearerAuth": []}],
+           "requestBody":{
+              "content":{
+                 "application/json":{
+                    "schema":{
+                       "$ref":"#/components/schemas/produto"
+                    },
+                    "examples":{
+                       "products":{
+                          "value":{
+                             "name":"Livros",
+                             "price":20.50,
+                             "quantity":123456
+                          }
+                       }
+                    }
+                 }
+              }
+           },
+           "responses":{
+              "409":{
+                 "description":"Conflict"
+              },
+              "200":{
+                 "description":"OK",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "type":"object",
+                          "$ref":"#/components/schemas/createProducts"
+                       }
+                    }
+                 }
+              }
+           }
+        },
+        "get":{
+           "summary":"Listar produtos",
+           "description":"Listando todos os produtos cadastrados na api",
+           "tags":[
+              "Products"
+           ],
+           "responses":{
+              "200":{
+                 "description":"OK",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "type":"object",
+                          "$ref":"#/components/schemas/getProducts"
+                       }
+                    }
+                 }
+              }
+           }
+        }
+     },
+     "/products/{id}":{
+        "put":{
+           "summary":"Atualizar produto por ID",
+           "parameters":[
+              {
+                 "name":"id",
+                 "in":"path",
+                 "description":"ID do produto",
+                 "required":true,
+                 "schema":{
+                    "type":"string",
+                    "format":"uuid"
+                 }
+              }
+           ],
+           "security": [{"bearerAuth": []}],
+           "description":"atualizando um Produto na aplicação",
+           "tags":[
+              "Products"
+           ],
+           "requestBody":{
+              "content":{
+                 "application/json":{
+                    "schema":{
+                       "$ref":"#/components/schemas/produto"
+                    },
+                    "examples":{
+                       "products":{
+                          "value":{
+                             "name":"Livros",
+                             "price":20.50,
+                             "quantity":123456
+                          }
+                       }
+                    }
+                 }
+              }
+           },
+           "responses":{
+              "404":{
+                 "description":"Not found"
+              },
+              "200":{
+                 "description":"OK",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "type":"object",
+                          "$ref":"#/components/schemas/createProducts"
+                       }
+                    }
+                 }
+              }
+           }
+        },
+        "get":{
+           "summary":"pegar produto por id",
+           "description":"Retorna um produto com base no ID passado por parametro",
+           "tags":[
+              "Products"
+           ],
+           "parameters":[
+              {
+                 "name":"id",
+                 "in":"path",
+                 "description":"ID do produto",
+                 "required":true,
+                 "schema":{
+                    "type":"string",
+                    "format":"uuid"
+                 }
+              }
+           ],
+           "responses":{
+              "200":{
+                 "description":"OK",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "type":"object",
+                          "$ref":"#/components/schemas/getProducts"
+                       }
+                    }
+                 }
+              }
+           }
+        },
+        "delete":{
+           "summary":"Deleta produto por id",
+           "description":"Deleta um produto com base no ID passado por parametro",
+           "tags":[
+              "Products"
+           ],
+           "security": [{"bearerAuth": []}],
+           "parameters":[
+              {
+                 "name":"id",
+                 "in":"path",
+                 "description":"ID do produto",
+                 "required":true,
+                 "schema":{
+                    "type":"string",
+                    "format":"uuid"
+                 }
+              }
+           ],
+           "responses":{
+              "204":{
+                 "description":"No Content"
+              }
+           }
+        }
+     },
+     "/order/{id}":{
+        "get":{
+           "summary":"Pega um pedido por id",
+           "parameters":[
+              {
+                 "name":"id",
+                 "in":"path",
+                 "description":"ID do pedido",
+                 "required":true,
+                 "schema":{
+                    "type":"string",
+                    "format":"uuid"
+                 }
+              }
+           ],
+           "security": [{"bearerAuth": []}],
+           "description":"pegando um pedido por id na aplicação",
+           "tags":[
+              "Orders"
+           ],
+           "responses":{
+              "404":{
+                 "description":"Not found"
+              },
+              "200":{
+                 "description":"OK"
+              }
+           }
+        }
+     },
+     "/order":{
+        "post":{
+           "summary":"Criar pedido",
+           "requestBody":{
+              "content":{
+                 "application/json":{
+                    "schema":{
+                       "$ref":"#/components/schemas/produto"
+                    },
+                    "examples":{
+                       "Costumer id and Product list":{
+                          "value":{
+                             "customer_id":"84d0055a-f6f6-402b-a18b-468bf738eada",
+                             "products":[
+                                {
+                                   "id":"b6c06750-1aae-4c4f-88ae-17803281dbfe",
+                                   "quantity":2
+                                }
+                             ]
+                          }
+                       }
+                    }
+                 }
+              }
+           },
+           "description":"Criando pedido do cliente pelo seu Id",
+           "tags":[
+              "Orders"
+           ],
+           "security": [{"bearerAuth": []}],
+           "responses":{
+              "404":{
+                 "description":"Not found"
+              },
+              "200":{
+                 "description":"OK"
+              }
+           }
+        }
+     },
+     "/customer":{
+      "post":{
+         "summary":"Criar cliente",
+         "requestBody":{
+            "content":{
+               "application/json":{
+                  "schema":{
+                     "$ref":"#/components/schemas/createCustomer"
+                  },
+                  "examples":{
+                     "Costumer id and Product list":{
+                        "value":{
+                          "email":"john@doe.com",
+                          "name":"John Doe"
+                        }
+                     }
+                  }
+               }
+            }
+         },
+         "description":"Criando um cliente",
+         "tags":[
+            "Customers"
+         ],
+         "security": [{"bearerAuth": []}],
+         "responses":{
+            "409":{
+               "description":"Conflict"
+            },
+            "200":{
+               "description":"OK"
+            }
+         }
+      },
+      "get":{
+        "summary":"Listar clientes",
+        "description":"Lista os clientes retornando uma paginação",
+        "tags":[
+           "Customers"
+        ],
+        "responses":{
+           "409":{
+              "description":"Conflict"
+           },
+           "200":{
+              "description":"OK"
+           }
+        }
+     }
+   },
+   "/customer/{id}":{
+    "put":{
+       "summary":"Atualiza cliente por ID ",
+       "description":"Atualiza um cliente com base no seu UUID",
+       "parameters":[
+        {
+           "name":"id",
+           "in":"path",
+           "description":"ID do cliente",
+           "required":true,
+           "schema":{
+              "type":"string",
+              "format":"uuid"
+           }
+        }
+     ],
+     "requestBody":{
+      "content":{
+         "application/json":{
+            "schema":{
+               "$ref":"#/components/schemas/createCustomer"
+            },
+            "examples":{
+               "Costumer id and Product list":{
+                  "value":{
+                    "email":"john@doe.com",
+                    "name":"John Doe"
+                  }
+               }
+            }
+         }
+      }
+   },
+       "tags":[
+          "Customers"
+       ],
+       "security": [{"bearerAuth": []}],
+       "responses":{
+          "400":{
+             "description":"Error"
+          },
+          "200":{
+             "description":"OK"
+          }
+       }
+    },
+    "get":{
+      "summary":"Pegar um cliente por Id",
+      "description":"Retorna dados de um cliente com base no seu ID",
+      "parameters":[
+        {
+           "name":"id",
+           "in":"path",
+           "description":"ID do cliente",
+           "required":true,
+           "schema":{
+              "type":"string",
+              "format":"uuid"
+           }
+        }
+     ],
+      "tags":[
+         "Customers"
+      ],
+      "responses":{
+         "409":{
+            "description":"Conflict"
+         },
+         "200":{
+            "description":"OK"
+         }
+      }
+   },
+   "delete":{
+    "summary":"Deletar um cliente",
+    "description":"Deleta o cliente com base no UUID",
+    "parameters":[
+      {
+         "name":"id",
+         "in":"path",
+         "description":"ID do cliente",
+         "required":true,
+         "schema":{
+            "type":"string",
+            "format":"uuid"
+         }
+      }
+   ],
+   "security": [{"bearerAuth": []}],
+    "tags":[
+       "Customers"
+    ],
+    "responses":{
+       "400":{
+          "description":"Error"
+       },
+       "204":{
+          "description":"No Content"
+       }
+    }
+ }
+ }
+  },
+  "components":{
+     "schemas":{
+        "users":{
+           "type":"object",
+           "properties":{
+              "name":{
+                 "type":"string"
+              },
+              "email":{
+                 "type":"string"
+              },
+              "password":{
+                 "type":"string"
+              }
+           }
+        },
+        "usersGet":{
+           "type":"object",
+           "properties":{
+              "id":{
+                 "type":"string",
+                 "format":"uuid"
+              },
+              "name":{
+                 "type":"string"
+              },
+              "email":{
+                 "type":"string"
+              },
+              "avatar":{
+                 "type":"string"
+              },
+              "avatar_url":{
+                 "type":"string"
+              }
+           }
+        },
+        "auth":{
+           "type":"object",
+           "properties":{
+              "email":{
+                 "type":"string"
+              },
+              "password":{
+                 "type":"string"
+              }
+           }
+        },
+        "createProducts":{
+           "type":"object",
+           "properties":{
+              "name":{
+                 "type":"string"
+              },
+              "price":{
+                 "type":"number",
+                 "format":"float"
+              },
+              "quantity":{
+                 "type":"integer"
+              }
+           }
+        },
+        "getProducts":{
+           "type":"object",
+           "properties":{
+              "id":{
+                 "type":"string",
+                 "format":"uuid"
+              },
+              "name":{
+                 "type":"string"
+              },
+              "price":{
+                 "type":"number",
+                 "format":"float"
+              },
+              "quantity":{
+                 "type":"integer"
+              }
+           }
+        },
+        "updateProfile":{
+           "type":"object",
+           "required":[
+              "name",
+              "email"
+           ],
+           "properties":{
+              "name":{
+                 "type":"string"
+              },
+              "email":{
+                 "type":"string"
+              },
+              "password":{
+                 "type":"string"
+              },
+              "password_confirmation":{
+                 "type":"string"
+              }
+           }
+        },
+        "getOrders":{
+           "type":"object",
+           "properties":{
+              "id":{
+                 "type":"string",
+                 "format":"uuid"
+              },
+              "name":{
+                 "type":"string"
+              },
+              "price":{
+                 "type":"number",
+                 "format":"float"
+              },
+              "quantity":{
+                 "type":"integer"
+              }
+           }
+        },
+        "createCustomer":{
+          "type":"object",
+          "properties":{
+             "name":{
+                "type":"string"
+             },
+             "email":{
+                "type":"string"
+             }
+          }
+       }
+     },
+     "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+     }
+  }
+}

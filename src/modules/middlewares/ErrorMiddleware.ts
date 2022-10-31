@@ -3,9 +3,9 @@ import AppError from '@shared/errors/AppError';
 
 const ErrorMiddleware = (
   error: Error,
-  req: Request,
+  _req: Request,
   res: Response,
-  _next: NextFunction,
+  next: NextFunction,
 ) => {
   if (error instanceof AppError) {
     res.status(error.statusCode).json({

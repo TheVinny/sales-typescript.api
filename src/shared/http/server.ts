@@ -9,9 +9,13 @@ import '@shared/database';
 import { errors } from 'celebrate';
 import upload from '@config/upload';
 import { pagination } from 'typeorm-pagination';
+import SwaggerUI from 'swagger-ui-express';
 import ratelimiter from '@modules/middlewares/rateLimiterMiddlerare';
+import SwaggerJson from '../../swagger.json';
 
 const app = express();
+
+app.use('/api-docs', SwaggerUI.serve, SwaggerUI.setup(SwaggerJson));
 
 app.use(cors());
 

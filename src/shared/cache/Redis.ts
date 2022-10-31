@@ -2,12 +2,15 @@ import Redis, { Redis as RedisClient } from 'ioredis';
 
 import redis from '@config/redis/redis';
 
-export default class RedisCache {
+class RedisCache {
   private client: RedisClient;
+  private connected = false;
 
   constructor() {
-    //instacinha o Redis passando a config como parametro
-    this.client = new Redis(redis.config.redis);
+    if (!this.connected) {
+      this.client = new Redis(redis.config.redis);
+      this.connected = true;
+    }
   }
 
   public async save(key: string, value: unknown): Promise<void> {
@@ -32,3 +35,5 @@ export default class RedisCache {
     await this.client.del(key);
   }
 }
+
+export default new RedisCache();

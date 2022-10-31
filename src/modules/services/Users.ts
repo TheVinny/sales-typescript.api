@@ -6,10 +6,14 @@ import { getCustomRepository } from 'typeorm';
 import { compare, hash } from 'bcrypt';
 import { isAfter, addHours } from 'date-fns';
 import JWT from 'jsonwebtoken';
-import upload from '@config/upload';
-import fs, { readFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import UserTokenRepository from '@modules/repositories/UserTokenRepository';
-import Ethereal from '@config/mails/Ethereal';
+import Ethereal from '@config/mails/EtherealMail';
+import SESMAIL from '@config/mails/SesMail';
+import mailConfig from '@config/mails/mail';
+import DiskStorage from '@shared/providers/DiskStorage';
+import uploadConfig from '@config/upload';
+import S3StorageProvider from '@shared/providers/S3Storage';
 
 interface IUser {
   name?: string;
@@ -80,22 +84,26 @@ class UsersService {
 
   async updateAvatar({ avatarFile, user_id }: IAvatarFile): Promise<User> {
     const repositoryUser = getCustomRepository(UserRepository);
+    const storageProvider = new DiskStorage();
+    const s3Provider = new S3StorageProvider();
 
     const user = await repositoryUser.findById(user_id);
 
     if (!user) throw new AppError('User not found', 404);
 
-    if (user.avatar) {
-      const avatarFilePath = path.join(upload.directory, user.avatar);
-
-      const userAvatarFile = await fs.promises.stat(avatarFilePath);
-
-      if (userAvatarFile) {
-        await fs.promises.unlink(avatarFilePath);
+    if (uploadConfig.driver === 's3') {
+      if (user.avatar) {
+        await s3Provider.deleteFile(user.avatar);
       }
+      const filename = await s3Provider.saveFile(avatarFile);
+      user.avatar = filename;
+    } else {
+      if (user.avatar) {
+        await storageProvider.deleteFile(user.avatar);
+      }
+      const filename = await storageProvider.saveFile(avatarFile);
+      user.avatar = filename;
     }
-
-    user.avatar = avatarFile;
 
     await repositoryUser.save(user);
 
@@ -122,6 +130,21 @@ class UsersService {
       'views',
       'forgot_password.hbs',
     );
+
+    if (mailConfig.driver === 'ses') {
+      await SESMAIL.sendMail({
+        to: { name: user.name, email: user.email },
+        subject: 'Recuperação de senha!',
+        template: {
+          file: forgotTemplate,
+          variables: {
+            link: `${process.env.APPWEB_URL}/reset_password?token=${token}`,
+            name: user.name,
+          },
+        },
+      });
+      return;
+    }
 
     await Ethereal.sendMail({
       to: { name: user.name, email: user.email },

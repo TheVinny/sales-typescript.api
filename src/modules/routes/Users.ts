@@ -6,7 +6,7 @@ import uploadConfig from '@config/upload';
 import AuthMiddleware from '@modules/middlewares/AuthMiddleware';
 
 const usersRouter: Router = Router();
-const upload = multer(uploadConfig);
+const upload = multer(uploadConfig.multer);
 
 const middleware = celebrate({
   [Segments.BODY]: {

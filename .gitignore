@@ -7,6 +7,6 @@ temp/
 coverage
 ormconfig.json
 dist
-
+jwt.auth.key
 uploads/*
 !uploads/.gitkeep

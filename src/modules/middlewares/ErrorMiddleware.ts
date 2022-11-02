@@ -5,7 +5,8 @@ const ErrorMiddleware = (
   error: Error,
   _req: Request,
   res: Response,
-  next: NextFunction,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _next: NextFunction,
 ) => {
   if (error instanceof AppError) {
     res.status(error.statusCode).json({
@@ -13,8 +14,6 @@ const ErrorMiddleware = (
       message: error.message,
     });
   }
-
-  console.log(error);
 
   res.status(500).json({
     status: 'error',

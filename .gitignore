@@ -4,6 +4,7 @@ node_modules/
 build/
 temp/
 .env
+.docker/dbdata
 coverage
 ormconfig.json
 dist

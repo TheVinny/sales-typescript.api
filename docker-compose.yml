@@ -3,12 +3,15 @@ version: '3'
 services:
   app:
     build: .
-    entrypoint: entrypoint.sh
+    entrypoint: .docker/entrypoint.sh
     container_name: salesapi-app
     ports:
       - '3333:3333'
     volumes:
       - .:/home/node/app
+    depends_on:
+      - db
+      - redis
 
   db:
     build: .docker/postgres
@@ -16,11 +19,11 @@ services:
     restart: always
     tty: true
     ports:
-      - '5432:5432'
+      - '6379:5432'
     volumes:
-      - .docker/dbdata:/var/lib/postgresql/data
+      - .docker/dbdata:/var/lib/postgresql/dataa
     environment:
-      - POSTGRES_PASSWORD=docker
+      - POSTGRES_PASSWORD=salesapi
       - POSTGRES_DB=salesapi
 
   redis:

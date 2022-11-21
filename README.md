@@ -2,6 +2,8 @@
 
 Projeto elaborado com o intuito de por em prática minhas habilidades
 
+Após rodar o projeto, você poderá importar as rotas no insomnia através do arquivo json na raiz do projeto
+
 ## Dependencies
 
 Para rodar o projeto, execute o script npm install ou yarn para instalar as dependências :
